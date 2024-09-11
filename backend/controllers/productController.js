@@ -6,9 +6,17 @@ exports.addProduct = async (req, res) => {
   try {
     const product = new Product({ name, category, price, stock, description, imageUrl });
     await product.save();
-    res.status(201).json({ success: true, message: 'Product added' });
+    return res.status(201).json({
+      success: true,
+      message: 'Product added successfully',
+      product,
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to add product',
+      error: err.message,
+    });
   }
 };
 
@@ -16,9 +24,16 @@ exports.addProduct = async (req, res) => {
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await Product.find({});
-    res.status(200).json(products);
+    return res.status(200).json({
+      success: true,
+      products,
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to retrieve products',
+      error: err.message,
+    });
   }
 };
 
@@ -26,10 +41,22 @@ exports.getAllProducts = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-    res.status(200).json(product);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      product,
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to retrieve product',
+      error: err.message,
+    });
   }
 };
 
@@ -40,12 +67,25 @@ exports.updateProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       { name, category, price, stock, description, imageUrl },
-      { new: true }
+      { new: true, runValidators: true } // `runValidators` ensures validation is applied during updates
     );
-    if (!updatedProduct) return res.status(404).json({ success: false, message: 'Product not found' });
-    res.status(200).json({ success: true, message: 'Product updated', updatedProduct });
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      updatedProduct,
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to update product',
+      error: err.message,
+    });
   }
 };
 
@@ -53,9 +93,21 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct) return res.status(404).json({ success: false, message: 'Product not found' });
-    res.status(200).json({ success: true, message: 'Product deleted' });
+    if (!deletedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Product deleted successfully',
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: 'Failed to delete product',
+      error: err.message,
+    });
   }
 };
